@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "users")
+@MappedSuperclass
+@Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -17,11 +17,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
-
     @Column(columnDefinition = "text")
     private String name;
-    @Column(columnDefinition = "text")
-    private String cpf;
     @Column(columnDefinition = "text")
     private String password;
 

@@ -16,9 +16,6 @@ import java.util.List;
 @Setter
 public class Aluno extends User{
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private String id;
 
         @Column(columnDefinition = "text")
         private String matricula;
