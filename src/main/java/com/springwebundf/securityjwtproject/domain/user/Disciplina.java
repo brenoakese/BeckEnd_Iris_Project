@@ -1,29 +1,31 @@
 package com.springwebundf.securityjwtproject.domain.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
+@Table(name = "disciplinas")
 @Entity
-@Table(name = "users")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class User {
+public class Disciplina {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
     @Column(columnDefinition = "text")
-    private String name;
-    @Column(columnDefinition = "text")
-    private String cpf;
-    @Column(columnDefinition = "text")
-    private String password;
+    private String nome;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
+
+    @ManyToMany(mappedBy = "disciplinas")
+    private List<Aluno> alunos;
 
 }
