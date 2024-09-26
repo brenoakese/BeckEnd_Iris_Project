@@ -1,7 +1,7 @@
 package com.springwebundf.securityjwtproject.infra.security;
 
-import com.springwebundf.securityjwtproject.domain.user.User;
-import com.springwebundf.securityjwtproject.repositories.UserRepository;
+import com.springwebundf.securityjwtproject.domain.user.Professor;
+import com.springwebundf.securityjwtproject.repositories.ProfessorRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     TokenService tokenService;
 
     @Autowired
-    UserRepository userRepository;
+    ProfessorRepository professorRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,9 +31,9 @@ public class SecurityFilter extends OncePerRequestFilter {
         var login = tokenService.validateToken(token);
 
         if(login != null) {
-            User user = userRepository.findByCpf(login).orElseThrow(() -> new RuntimeException("User not found."));
+            Professor professor = professorRepository.findByCpf(login).orElseThrow(() -> new RuntimeException("User not found."));
             var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+            var authentication = new UsernamePasswordAuthenticationToken(professor, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
     }

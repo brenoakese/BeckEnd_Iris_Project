@@ -19,6 +19,4 @@ public class Professor extends User{
     @OneToMany(mappedBy = "professor", fetch = FetchType.EAGER)
     private List<Disciplina> disciplinas;
 
-    @Column(columnDefinition = "text")
-    private String cpf;
 }

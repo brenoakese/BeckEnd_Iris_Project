@@ -16,10 +16,6 @@ import java.util.List;
 @Setter
 public class Aluno extends User{
 
-
-        @Column(columnDefinition = "text")
-        private String matricula;
-
         @ManyToMany
         @JoinTable(
             name = "aluno_disciplinas",

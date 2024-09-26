@@ -1,10 +1,10 @@
 package com.springwebundf.securityjwtproject.controllers;
 
-import com.springwebundf.securityjwtproject.domain.user.User;
+import com.springwebundf.securityjwtproject.domain.user.Professor;
 import com.springwebundf.securityjwtproject.dto.RegisterRequestDTO;
 import com.springwebundf.securityjwtproject.dto.ResponseDTO;
 import com.springwebundf.securityjwtproject.infra.security.TokenService;
-import com.springwebundf.securityjwtproject.repositories.UserRepository;
+import com.springwebundf.securityjwtproject.repositories.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,16 +20,16 @@ import java.util.Optional;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final UserRepository userRepository;
+    private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
-        User user = userRepository.findByCpf(body.cpf()).orElseThrow(() -> new RuntimeException("User not found."));
-        if (passwordEncoder.matches(body.password(), user.getPassword())) {
-            String token = tokenService.generateToken(user);
-            return ResponseEntity.ok( new ResponseDTO(token, user.getName()));
+        Professor professor = professorRepository.findByCpf(body.cpf()).orElseThrow(() -> new RuntimeException("User not found."));
+        if (passwordEncoder.matches(body.password(), professor.getPassword())) {
+            String token = tokenService.generateToken(professor);
+            return ResponseEntity.ok( new ResponseDTO(token, professor.getName()));
         }
         return ResponseEntity.badRequest().build();
     }
@@ -37,19 +37,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequestDTO body){
-        Optional<User> user = userRepository.findByCpf(body.cpf());
+        Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
 
-        if(user.isPresent()){
+        if(professor.isPresent()){
             return ResponseEntity.badRequest().build();
         }
         else {
-            User newUser = new User();
-            newUser.setName(body.name());
-            newUser.setCpf(body.cpf());
-            newUser.setPassword(passwordEncoder.encode(body.password()));
-            userRepository.save(newUser);
-            String token = tokenService.generateToken(newUser);
-            return ResponseEntity.ok(new ResponseDTO(token, newUser.getName()));
+            Professor newprofessor = new Professor();
+            newprofessor.setName(body.name());
+            newprofessor.setCpf(body.cpf());
+            newprofessor.setPassword(passwordEncoder.encode(body.password()));
+            professorRepository.save(newprofessor);
+            String token = tokenService.generateToken(newprofessor);
+            return ResponseEntity.ok(new ResponseDTO(token, newprofessor.getName()));
         }
     }
 }
