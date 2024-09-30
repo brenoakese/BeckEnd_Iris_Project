@@ -15,7 +15,7 @@ import java.util.List;
 public class Disciplina {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
 
     @Column(columnDefinition = "text")
