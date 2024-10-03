@@ -14,8 +14,8 @@ import lombok.Setter;
 public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
     @Column(columnDefinition = "text")
     private String name;
     @Column(columnDefinition = "text")
