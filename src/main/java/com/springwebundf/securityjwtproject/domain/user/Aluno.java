@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -14,7 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Aluno extends User{
+public class Aluno extends User implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         @ManyToMany
         @JoinTable(
