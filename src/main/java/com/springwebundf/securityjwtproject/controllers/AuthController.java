@@ -1,9 +1,12 @@
 package com.springwebundf.securityjwtproject.controllers;
 
+import com.springwebundf.securityjwtproject.domain.user.Aluno;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
+import com.springwebundf.securityjwtproject.domain.user.User;
 import com.springwebundf.securityjwtproject.dto.RegisterRequestDTO;
 import com.springwebundf.securityjwtproject.dto.ResponseDTO;
 import com.springwebundf.securityjwtproject.infra.security.TokenService;
+import com.springwebundf.securityjwtproject.repositories.AlunoRepository;
 import com.springwebundf.securityjwtproject.repositories.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,8 @@ import java.util.Optional;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
+    private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
@@ -51,5 +56,14 @@ public class AuthController {
             String token = tokenService.generateToken(newprofessor);
             return ResponseEntity.ok(new ResponseDTO(token, newprofessor.getName()));
         }
+    }
+    private User getUser(String cpf) {
+        Optional<Aluno> aluno = alunoRepository.findByCpf(cpf);
+
+        if(aluno.isPresent()) return aluno.get();
+
+        Optional<Professor> professor = professorRepository.findByCpf(cpf);
+
+        return professor.orElse(null);
     }
 }

@@ -25,13 +25,12 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            String token = JWT.create()
+            return JWT.create()
                     .withIssuer("login-auth-api")
                     .withSubject(professor.getCpf())
                     .withExpiresAt(Date.from(generateExpirationDate()))
                     .sign(algorithm);
 
-            return token;
         }catch (JWTCreationException e) {
             throw new RuntimeException("Error generating token.");
         }
