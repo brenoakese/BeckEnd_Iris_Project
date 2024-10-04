@@ -26,11 +26,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final CoordenadorRepository coordenadorRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final CoordenadorRepository coordenadorRepository;
+
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
@@ -76,7 +77,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register/coordenador")
+    @PostMapping("/register-coordenador")
     public ResponseEntity registerCoordenador(@RequestBody RegisterRequestDTO body){
         Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
 
@@ -92,9 +93,10 @@ public class AuthController {
             String token = tokenService.generateToken(newCoordenador);
             return ResponseEntity.ok(new ResponseDTO(token, newCoordenador.getName(), "coordenador"));
         }
-
-
     }
+
+
+
     private String typeUser(String cpf) {
         Optional<Aluno> aluno = alunoRepository.findByCpf(cpf);
 
