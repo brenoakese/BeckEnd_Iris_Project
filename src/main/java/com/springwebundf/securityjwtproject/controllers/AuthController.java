@@ -1,12 +1,14 @@
 package com.springwebundf.securityjwtproject.controllers;
 
 import com.springwebundf.securityjwtproject.domain.user.Aluno;
+import com.springwebundf.securityjwtproject.domain.user.Coordenador;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
 import com.springwebundf.securityjwtproject.domain.user.User;
 import com.springwebundf.securityjwtproject.dto.RegisterRequestDTO;
 import com.springwebundf.securityjwtproject.dto.ResponseDTO;
 import com.springwebundf.securityjwtproject.infra.security.TokenService;
 import com.springwebundf.securityjwtproject.repositories.AlunoRepository;
+import com.springwebundf.securityjwtproject.repositories.CoordenadorRepository;
 import com.springwebundf.securityjwtproject.repositories.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +30,30 @@ public class AuthController {
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final CoordenadorRepository coordenadorRepository;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
-        Professor professor = professorRepository.findByCpf(body.cpf()).orElseThrow(() -> new RuntimeException("User not found."));
-        if (passwordEncoder.matches(body.password(), professor.getPassword())) {
-            String token = tokenService.generateToken(professor);
-            return ResponseEntity.ok( new ResponseDTO(token, professor.getName()));
+
+        String typeUser = typeUser(body.cpf());
+        if(typeUser == null) return ResponseEntity.badRequest().build();
+
+        else if (typeUser.equals("aluno")) {
+            Optional<Aluno> aluno = alunoRepository.findByCpf(body.cpf());
+            if(aluno.isPresent() && passwordEncoder.matches(body.password(), aluno.get().getPassword())){
+                String token = tokenService.generateToken(aluno.get());
+                return ResponseEntity.ok(new ResponseDTO(token, aluno.get().getName(), "aluno"));
+            }
         }
+        else if (typeUser.equals("professor")) {
+            Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
+            if(professor.isPresent() && passwordEncoder.matches(body.password(), professor.get().getPassword())){
+                String token = tokenService.generateToken(professor.get());
+                return ResponseEntity.ok(new ResponseDTO(token, professor.get().getName(), "professor"));
+            }
+
+        }
+
         return ResponseEntity.badRequest().build();
     }
 
@@ -54,16 +72,38 @@ public class AuthController {
             newprofessor.setPassword(passwordEncoder.encode(body.password()));
             professorRepository.save(newprofessor);
             String token = tokenService.generateToken(newprofessor);
-            return ResponseEntity.ok(new ResponseDTO(token, newprofessor.getName()));
+            return ResponseEntity.ok(new ResponseDTO(token, newprofessor.getName(), ""));
         }
     }
-    private User getUser(String cpf) {
+
+    @PostMapping("/register/coordenador")
+    public ResponseEntity registerCoordenador(@RequestBody RegisterRequestDTO body){
+        Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
+
+        if(coordenador.isPresent()){
+            return ResponseEntity.badRequest().build();
+        }
+        else {
+            Coordenador newCoordenador = new Coordenador();
+            newCoordenador.setName(body.name());
+            newCoordenador.setCpf(body.cpf());
+            newCoordenador.setPassword(passwordEncoder.encode(body.password()));
+            coordenadorRepository.save(newCoordenador);
+            String token = tokenService.generateToken(newCoordenador);
+            return ResponseEntity.ok(new ResponseDTO(token, newCoordenador.getName(), "coordenador"));
+        }
+
+
+    }
+    private String typeUser(String cpf) {
         Optional<Aluno> aluno = alunoRepository.findByCpf(cpf);
 
-        if(aluno.isPresent()) return aluno.get();
+        if(aluno.isPresent()) return "aluno";
 
         Optional<Professor> professor = professorRepository.findByCpf(cpf);
 
-        return professor.orElse(null);
+        if(professor.isPresent()) return "professor";
+
+        return null;
     }
 }

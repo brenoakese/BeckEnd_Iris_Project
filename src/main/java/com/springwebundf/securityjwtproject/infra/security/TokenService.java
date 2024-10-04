@@ -21,13 +21,13 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateToken(Professor professor) {
+    public String generateToken(User user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.create()
                     .withIssuer("login-auth-api")
-                    .withSubject(professor.getCpf())
+                    .withSubject(user.getCpf())
                     .withExpiresAt(Date.from(generateExpirationDate()))
                     .sign(algorithm);
 
