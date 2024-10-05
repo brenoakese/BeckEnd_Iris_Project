@@ -1,6 +1,5 @@
 package com.springwebundf.securityjwtproject.controllers;
 
-import com.springwebundf.securityjwtproject.domain.user.Aluno;
 import com.springwebundf.securityjwtproject.domain.user.Coordenador;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
 import com.springwebundf.securityjwtproject.domain.user.User;
@@ -37,10 +36,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
+
         Map<String, UserRepository<? extends User>> repositories = Map.of(
                 "professor", professorRepository,
                 "coordenador", coordenadorRepository
         );
+
         for(Map.Entry<String, UserRepository<? extends User>> entry : repositories.entrySet()){
             Optional<? extends User> user = entry.getValue().findByCpf(body.cpf());
             if(user.isPresent() && passwordEncoder.matches(body.password(), user.get().getPassword())){
@@ -48,6 +49,7 @@ public class AuthController {
                 return ResponseEntity.ok(new ResponseDTO(token, user.get().getName(), entry.getKey()));
             }
         }
+
         return ResponseEntity.badRequest().build();
     }
 
@@ -59,14 +61,15 @@ public class AuthController {
         if(professor.isPresent()){
             return ResponseEntity.badRequest().build();
         }
-        else {
-            Professor newprofessor = new Professor();
-            newprofessor.setName(body.name());
-            newprofessor.setCpf(body.cpf());
-            newprofessor.setPassword(passwordEncoder.encode(body.password()));
-            professorRepository.save(newprofessor);
-            return ResponseEntity.ok().build();
-        }
+        Professor newprofessor = new Professor();
+
+        newprofessor.setName(body.name());
+        newprofessor.setCpf(body.cpf());
+        newprofessor.setPassword(passwordEncoder.encode(body.password()));
+
+        professorRepository.save(newprofessor);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/register/coordenador")
@@ -76,13 +79,14 @@ public class AuthController {
         if(coordenador.isPresent()){
             return ResponseEntity.badRequest().build();
         }
-        else {
-            Coordenador newCoordenador = new Coordenador();
-            newCoordenador.setName(body.name());
-            newCoordenador.setCpf(body.cpf());
-            newCoordenador.setPassword(passwordEncoder.encode(body.password()));
-            coordenadorRepository.save(newCoordenador);
-            return ResponseEntity.ok().build();
-        }
+        Coordenador newCoordenador = new Coordenador();
+
+        newCoordenador.setName(body.name());
+        newCoordenador.setCpf(body.cpf());
+        newCoordenador.setPassword(passwordEncoder.encode(body.password()));
+
+        coordenadorRepository.save(newCoordenador);
+
+        return ResponseEntity.ok().build();
     }
 }
