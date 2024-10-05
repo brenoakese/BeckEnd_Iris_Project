@@ -77,7 +77,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register-coordenador")
+    @PostMapping("/register/coordenador")
     public ResponseEntity registerCoordenador(@RequestBody RegisterRequestDTO body){
         Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
 
