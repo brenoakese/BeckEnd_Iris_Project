@@ -72,8 +72,7 @@ public class AuthController {
             newprofessor.setCpf(body.cpf());
             newprofessor.setPassword(passwordEncoder.encode(body.password()));
             professorRepository.save(newprofessor);
-            String token = tokenService.generateToken(newprofessor);
-            return ResponseEntity.ok(new ResponseDTO(token, newprofessor.getName(), ""));
+            return ResponseEntity.ok().build();
         }
     }
 
@@ -90,8 +89,7 @@ public class AuthController {
             newCoordenador.setCpf(body.cpf());
             newCoordenador.setPassword(passwordEncoder.encode(body.password()));
             coordenadorRepository.save(newCoordenador);
-            String token = tokenService.generateToken(newCoordenador);
-            return ResponseEntity.ok(new ResponseDTO(token, newCoordenador.getName(), "coordenador"));
+            return ResponseEntity.ok().build();
         }
     }
 
