@@ -32,24 +32,16 @@ public class AuthController {
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
-
-        Map<String, UserRepository<? extends User>> repositories = Map.of(
-                "professor", professorRepository,
-                "coordenador", coordenadorRepository
-        );
-
-        for(Map.Entry<String, UserRepository<? extends User>> entry : repositories.entrySet()){
-            Optional<? extends User> user = entry.getValue().findByCpf(body.cpf());
-            if(user.isPresent() && passwordEncoder.matches(body.password(), user.get().getPassword())){
-                String token = tokenService.generateToken(user.get());
-                return ResponseEntity.ok(new ResponseDTO(token, user.get().getName(), entry.getKey()));
-            }
+        Optional<User> user = userRepository.findByCpf(body.cpf());
+        if (user.isPresent() && passwordEncoder.matches(body.password(), user.get().getPassword())) {
+            String token = tokenService.generateToken(user.get());
+            return ResponseEntity.ok(new ResponseDTO(token, user.get().getName(), user.get().getClass().getSimpleName().toUpperCase()));
         }
-
         return ResponseEntity.badRequest().build();
     }
 
