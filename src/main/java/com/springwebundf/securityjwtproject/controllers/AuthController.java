@@ -48,9 +48,9 @@ public class AuthController {
 
     @PostMapping("/register/professor")
     public ResponseEntity register(@RequestBody RegisterRequestDTO body){
-        Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
+        Optional<User> user = userRepository.findByCpf(body.cpf());
 
-        if(professor.isPresent()){
+        if(user.isPresent()){
             return ResponseEntity.badRequest().build();
         }
         Professor newprofessor = new Professor();
@@ -66,9 +66,9 @@ public class AuthController {
 
     @PostMapping("/register/coordenador")
     public ResponseEntity registerCoordenador(@RequestBody RegisterRequestDTO body){
-        Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
+        Optional<User> user = userRepository.findByCpf(body.cpf());
 
-        if(coordenador.isPresent()){
+        if(user.isPresent()){
             return ResponseEntity.badRequest().build();
         }
         Coordenador newCoordenador = new Coordenador();
