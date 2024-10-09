@@ -21,6 +21,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private ProfessorRepository professorRepository;
 
+    
+
     @Override
     public UserDetails loadUserByUsername(String cpf) throws UsernameNotFoundException {
         Professor professor = professorRepository.findByCpf(cpf).orElseThrow(() -> new UsernameNotFoundException("User not found."));

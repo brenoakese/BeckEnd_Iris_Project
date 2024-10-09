@@ -1,14 +1,11 @@
 package com.springwebundf.securityjwtproject.domain.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -24,7 +21,6 @@ public abstract class User {
     private String password;
     @Column(columnDefinition = "text")
     private String cpf;
-
 
 
 }
