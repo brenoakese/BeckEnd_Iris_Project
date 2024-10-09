@@ -1,10 +1,7 @@
 package com.springwebundf.securityjwtproject.domain.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,5 +20,8 @@ public class Professor extends User implements Serializable {
 
     @OneToMany(mappedBy = "professor", fetch = FetchType.EAGER)
     private List<Disciplina> disciplinas;
+
+    @Setter(AccessLevel.NONE)
+    private String role = "ROLE_PROFESSOR";
 
 }
