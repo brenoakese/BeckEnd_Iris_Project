@@ -15,7 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Coordenador extends User implements Serializable {
+public class Coordenador extends User {
 
    @Serial
    private static final long serialVersionUID = 1L;

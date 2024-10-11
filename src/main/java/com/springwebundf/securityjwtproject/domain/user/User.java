@@ -3,14 +3,15 @@ package com.springwebundf.securityjwtproject.domain.user;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 
-@Entity
+@MappedSuperclass
 @Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public abstract class User {
+public abstract class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

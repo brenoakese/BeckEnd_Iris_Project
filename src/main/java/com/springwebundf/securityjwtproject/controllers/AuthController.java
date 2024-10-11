@@ -1,5 +1,6 @@
 package com.springwebundf.securityjwtproject.controllers;
 
+import com.springwebundf.securityjwtproject.domain.user.Aluno;
 import com.springwebundf.securityjwtproject.domain.user.Coordenador;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
 import com.springwebundf.securityjwtproject.domain.user.User;
@@ -9,7 +10,6 @@ import com.springwebundf.securityjwtproject.infra.security.TokenService;
 import com.springwebundf.securityjwtproject.repositories.AlunoRepository;
 import com.springwebundf.securityjwtproject.repositories.CoordenadorRepository;
 import com.springwebundf.securityjwtproject.repositories.ProfessorRepository;
-import com.springwebundf.securityjwtproject.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.springwebundf.securityjwtproject.dto.LoginRequestDTO;
 
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -32,27 +31,50 @@ public class AuthController {
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
 
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
-        Optional<User> user = userRepository.findByCpf(body.cpf());
-        if (user.isPresent() && passwordEncoder.matches(body.password(), user.get().getPassword())) {
-            String token = tokenService.generateToken(user.get());
-            return ResponseEntity.ok(new ResponseDTO(token, user.get().getName(), user.get().getClass().getSimpleName().toUpperCase()));
+        String user = typeUser(body.cpf());
+        if(user == null) return ResponseEntity.badRequest().build();
+
+        if (user.equals("aluno")) {
+            Optional<Aluno> aluno = alunoRepository.findByCpf(body.cpf());
+            if(aluno.isPresent() && passwordEncoder.matches(body.password(), aluno.get().getPassword())){
+                String token = tokenService.generateToken(aluno.get());
+                return ResponseEntity.ok(new ResponseDTO(token, aluno.get().getName(), "ALUNO"));
+            }
         }
+
+        if (user.equals("professor")) {
+            Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
+            if(professor.isPresent() && passwordEncoder.matches(body.password(), professor.get().getPassword())){
+                String token = tokenService.generateToken(professor.get());
+                return ResponseEntity.ok(new ResponseDTO(token, professor.get().getName(), "PROFESSOR"));
+            }
+
+        }
+
+        if(user.equals("coordenador")){
+            Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
+            if(coordenador.isPresent() && passwordEncoder.matches(body.password(), coordenador.get().getPassword())){
+                String token = tokenService.generateToken(coordenador.get());
+                return ResponseEntity.ok(new ResponseDTO(token, coordenador.get().getName(), "COORDENADOR"));
+            }
+        }
+
         return ResponseEntity.badRequest().build();
     }
 
 
     @PostMapping("/register/professor")
     public ResponseEntity register(@RequestBody RegisterRequestDTO body){
-        Optional<User> user = userRepository.findByCpf(body.cpf());
+        String user = typeUser(body.cpf());
 
-        if(user.isPresent()){
+        if(user != null){
             return ResponseEntity.badRequest().build();
         }
+
         Professor newprofessor = new Professor();
 
         newprofessor.setName(body.name());
@@ -66,11 +88,12 @@ public class AuthController {
 
     @PostMapping("/register/coordenador")
     public ResponseEntity registerCoordenador(@RequestBody RegisterRequestDTO body){
-        Optional<User> user = userRepository.findByCpf(body.cpf());
+        String user = typeUser(body.cpf());
 
-        if(user.isPresent()){
+        if(user != null){
             return ResponseEntity.badRequest().build();
         }
+
         Coordenador newCoordenador = new Coordenador();
 
         newCoordenador.setName(body.name());
@@ -80,5 +103,20 @@ public class AuthController {
         coordenadorRepository.save(newCoordenador);
 
         return ResponseEntity.ok().build();
+    }
+
+    private String typeUser(String cpf) {
+        Optional<Aluno> aluno = alunoRepository.findByCpf(cpf);
+
+        if(aluno.isPresent()) return "aluno";
+
+        Optional<Professor> professor = professorRepository.findByCpf(cpf);
+
+        if(professor.isPresent()) return "professor";
+
+        Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(cpf);
+        if(coordenador.isPresent()) return "coordenador";
+
+        return null;
     }
 }
