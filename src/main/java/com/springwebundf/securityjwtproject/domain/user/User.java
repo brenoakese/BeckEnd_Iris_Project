@@ -6,7 +6,6 @@ import lombok.*;
 import java.io.Serializable;
 
 @MappedSuperclass
-@Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
