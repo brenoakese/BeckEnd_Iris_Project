@@ -1,12 +1,13 @@
-package com.springwebundf.securityjwtproject.infra.security;
+package com.springwebundf.securityjwtproject.JdbcConfiguration;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 
+@Configuration
 public class JdbcConfig {
 
     @Bean

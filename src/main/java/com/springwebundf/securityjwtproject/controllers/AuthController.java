@@ -1,11 +1,13 @@
 package com.springwebundf.securityjwtproject.controllers;
 
+import com.springwebundf.securityjwtproject.Services.UserService;
 import com.springwebundf.securityjwtproject.domain.user.Aluno;
 import com.springwebundf.securityjwtproject.domain.user.Coordenador;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
 import com.springwebundf.securityjwtproject.domain.user.User;
 import com.springwebundf.securityjwtproject.dto.RegisterRequestDTO;
 import com.springwebundf.securityjwtproject.dto.ResponseDTO;
+import com.springwebundf.securityjwtproject.infra.security.TokenData;
 import com.springwebundf.securityjwtproject.infra.security.TokenService;
 import com.springwebundf.securityjwtproject.repositories.AlunoRepository;
 import com.springwebundf.securityjwtproject.repositories.CoordenadorRepository;
@@ -31,6 +33,7 @@ public class AuthController {
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
 
     @PostMapping("/login")
@@ -42,14 +45,14 @@ public class AuthController {
         else if (typeUser.equals("aluno")) {
             Optional<Aluno> aluno = alunoRepository.findByCpf(body.cpf());
             if(aluno.isPresent() && passwordEncoder.matches(body.password(), aluno.get().getPassword())){
-                String token = tokenService.generateToken(aluno.get());
+                TokenData token = tokenService.generateToken(aluno.get());
                 return ResponseEntity.ok(new ResponseDTO(token, aluno.get().getName(), "aluno"));
             }
         }
         else if (typeUser.equals("professor")) {
             Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
             if(professor.isPresent() && passwordEncoder.matches(body.password(), professor.get().getPassword())){
-                String token = tokenService.generateToken(professor.get());
+                TokenData token = tokenService.generateToken(professor.get());
                 return ResponseEntity.ok(new ResponseDTO(token, professor.get().getName(), "professor"));
             }
 
@@ -89,6 +92,7 @@ public class AuthController {
             newCoordenador.setCpf(body.cpf());
             newCoordenador.setPassword(passwordEncoder.encode(body.password()));
             coordenadorRepository.save(newCoordenador);
+
             return ResponseEntity.ok().build();
         }
     }

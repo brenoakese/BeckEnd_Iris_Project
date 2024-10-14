@@ -1,4 +1,8 @@
 package com.springwebundf.securityjwtproject.dto;
 
-public record ResponseDTO(String token,String name, String typeUser) {
+import com.springwebundf.securityjwtproject.infra.security.TokenData;
+
+import java.time.Instant;
+
+public record ResponseDTO(TokenData token, String name, String typeUser) {
 }
