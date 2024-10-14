@@ -26,7 +26,5 @@ public class Aluno extends User implements Serializable {
         )
         private List<Disciplina> disciplinas;
 
-        @Setter(AccessLevel.NONE)
-        private String role = "ROLE_ALUNO";
 
 }

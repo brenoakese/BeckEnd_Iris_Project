@@ -1,10 +1,8 @@
 package com.springwebundf.securityjwtproject.controllers;
 
-import com.springwebundf.securityjwtproject.Services.UserService;
 import com.springwebundf.securityjwtproject.domain.user.Aluno;
 import com.springwebundf.securityjwtproject.domain.user.Coordenador;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
-import com.springwebundf.securityjwtproject.domain.user.User;
 import com.springwebundf.securityjwtproject.dto.RegisterRequestDTO;
 import com.springwebundf.securityjwtproject.dto.ResponseDTO;
 import com.springwebundf.securityjwtproject.infra.security.TokenData;
@@ -33,7 +31,6 @@ public class AuthController {
     private final ProfessorRepository professorRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
 
 
     @PostMapping("/login")

@@ -10,10 +10,6 @@ import lombok.*;
 @Setter
 public class User {
 
-    public User(String tipo, String cpf) {
-       setCpf(cpf);
-       this.tipo = tipo;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -27,5 +23,8 @@ public class User {
 
     @Setter(AccessLevel.NONE)
     private String tipo;
+
+    @Enumerated(EnumType.STRING)
+    private Roles role;
 
 }

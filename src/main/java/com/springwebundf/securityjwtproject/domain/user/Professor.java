@@ -21,7 +21,6 @@ public class Professor extends User implements Serializable {
     @OneToMany(mappedBy = "professor", fetch = FetchType.EAGER)
     private List<Disciplina> disciplinas;
 
-    @Setter(AccessLevel.NONE)
-    private String role = "ROLE_PROFESSOR";
+
 
 }
