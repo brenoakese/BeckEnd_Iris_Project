@@ -3,6 +3,7 @@ package com.springwebundf.securityjwtproject.controllers;
 import com.springwebundf.securityjwtproject.domain.user.Aluno;
 import com.springwebundf.securityjwtproject.domain.user.Coordenador;
 import com.springwebundf.securityjwtproject.domain.user.Professor;
+import com.springwebundf.securityjwtproject.dto.LoginRequestDTO;
 import com.springwebundf.securityjwtproject.dto.RegisterRequestDTO;
 import com.springwebundf.securityjwtproject.dto.ResponseDTO;
 import com.springwebundf.securityjwtproject.infra.security.TokenData;
@@ -10,6 +11,7 @@ import com.springwebundf.securityjwtproject.infra.security.TokenService;
 import com.springwebundf.securityjwtproject.repositories.AlunoRepository;
 import com.springwebundf.securityjwtproject.repositories.CoordenadorRepository;
 import com.springwebundf.securityjwtproject.repositories.ProfessorRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,9 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.springwebundf.securityjwtproject.dto.LoginRequestDTO;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,69 +31,89 @@ public class AuthController {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
-
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequestDTO body){
+    public ResponseEntity login(@RequestBody LoginRequestDTO body) {
+        String user = typeUser(body.cpf());
+        if(user == null) return ResponseEntity.badRequest().build();
 
-        String typeUser = typeUser(body.cpf());
-        if(typeUser == null) return ResponseEntity.badRequest().build();
-
-        else if (typeUser.equals("aluno")) {
-            Optional<Aluno> aluno = alunoRepository.findByCpf(body.cpf());
-            if(aluno.isPresent() && passwordEncoder.matches(body.password(), aluno.get().getPassword())){
-                TokenData token = tokenService.generateToken(aluno.get());
-                return ResponseEntity.ok(new ResponseDTO(token, aluno.get().getName(), "aluno"));
+        if (user.equals("coordenador")) {
+            Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
+            if (
+                coordenador.isPresent() &&
+                passwordEncoder.matches(
+                    body.password(),
+                    coordenador.get().getPassword()
+                )
+            ) {
+                TokenData token = tokenService.generateToken(coordenador.get());
+                return ResponseEntity.ok(
+                    new ResponseDTO(token, coordenador.get().getName(), "coordenador")
+                );
             }
         }
-        else if (typeUser.equals("professor")) {
-            Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
-            if(professor.isPresent() && passwordEncoder.matches(body.password(), professor.get().getPassword())){
-                TokenData token = tokenService.generateToken(professor.get());
-                return ResponseEntity.ok(new ResponseDTO(token, professor.get().getName(), "professor"));
-            }
 
+        if (user.equals("professor")) {
+            Optional<Professor> professor = professorRepository.findByCpf(
+                body.cpf()
+            );
+            if (
+                professor.isPresent() &&
+                passwordEncoder.matches(
+                    body.password(),
+                    professor.get().getPassword()
+                )
+            ) {
+                TokenData token = tokenService.generateToken(professor.get());
+                return ResponseEntity.ok(
+                    new ResponseDTO(
+                        token,
+                        professor.get().getName(),
+                        "professor"
+                    )
+                );
+            }
         }
 
         return ResponseEntity.badRequest().build();
     }
 
-
-    @PostMapping("/register")
+    @PostMapping("/register/professor")
     public ResponseEntity register(@RequestBody RegisterRequestDTO body){
-        Optional<Professor> professor = professorRepository.findByCpf(body.cpf());
+        String user = typeUser(body.cpf());
 
-        if(professor.isPresent()){
+        if(user != null){
             return ResponseEntity.badRequest().build();
         }
-        else {
-            Professor newprofessor = new Professor();
-            newprofessor.setName(body.name());
-            newprofessor.setCpf(body.cpf());
-            newprofessor.setPassword(passwordEncoder.encode(body.password()));
-            professorRepository.save(newprofessor);
-            return ResponseEntity.ok().build();
-        }
+
+        Professor newprofessor = new Professor();
+
+        newprofessor.setName(body.name());
+        newprofessor.setCpf(body.cpf());
+        newprofessor.setPassword(passwordEncoder.encode(body.password()));
+
+        professorRepository.save(newprofessor);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/register/coordenador")
     public ResponseEntity registerCoordenador(@RequestBody RegisterRequestDTO body){
-        Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(body.cpf());
+        String user = typeUser(body.cpf());
 
-        if(coordenador.isPresent()){
+        if(user != null){
             return ResponseEntity.badRequest().build();
         }
-        else {
-            Coordenador newCoordenador = new Coordenador();
-            newCoordenador.setName(body.name());
-            newCoordenador.setCpf(body.cpf());
-            newCoordenador.setPassword(passwordEncoder.encode(body.password()));
-            coordenadorRepository.save(newCoordenador);
 
-            return ResponseEntity.ok().build();
-        }
+        Coordenador newCoordenador = new Coordenador();
+
+        newCoordenador.setName(body.name());
+        newCoordenador.setCpf(body.cpf());
+        newCoordenador.setPassword(passwordEncoder.encode(body.password()));
+
+        coordenadorRepository.save(newCoordenador);
+
+        return ResponseEntity.ok().build();
     }
-
-
 
     private String typeUser(String cpf) {
         Optional<Aluno> aluno = alunoRepository.findByCpf(cpf);
@@ -104,6 +123,9 @@ public class AuthController {
         Optional<Professor> professor = professorRepository.findByCpf(cpf);
 
         if(professor.isPresent()) return "professor";
+
+        Optional<Coordenador> coordenador = coordenadorRepository.findByCpf(cpf);
+        if(coordenador.isPresent()) return "coordenador";
 
         return null;
     }
